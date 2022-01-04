@@ -1,4 +1,7 @@
-package no.esa.playlistanalysis.integration.spotify.model
+package no.esa.playlistanalysis.integration.spotify.model.getplaylist
+
+import no.esa.playlistanalysis.integration.spotify.model.common.ExternalUrls
+import no.esa.playlistanalysis.integration.spotify.model.common.Image
 
 data class Playlist(val collaborative: Boolean,
                     val description: String,

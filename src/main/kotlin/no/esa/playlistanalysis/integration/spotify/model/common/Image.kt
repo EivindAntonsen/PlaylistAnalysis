@@ -1,4 +1,4 @@
-package no.esa.playlistanalysis.integration.spotify.model
+package no.esa.playlistanalysis.integration.spotify.model.common
 
 data class Image(val height: Int,
                  val url: String,

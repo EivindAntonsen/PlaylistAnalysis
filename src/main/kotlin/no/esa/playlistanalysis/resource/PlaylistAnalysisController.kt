@@ -2,7 +2,7 @@ package no.esa.playlistanalysis.resource
 
 import no.esa.playlistanalysis.annotation.Logged
 import no.esa.playlistanalysis.enums.APIType
-import no.esa.playlistanalysis.integration.spotify.model.Playlist
+import no.esa.playlistanalysis.resource.model.GetPlaylistResponse
 import no.esa.playlistanalysis.service.playlist.IPlaylistService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
@@ -11,25 +11,29 @@ import org.springframework.web.bind.annotation.RestController
 class PlaylistAnalysisController(private val playlistService: IPlaylistService) : PlaylistAnalysisApi {
 
     @Logged(APIType.EXTERNAL)
-    override fun getUsersMostDanceablePlaylist(username: String): ResponseEntity<Playlist> {
-        val result = playlistService.getUsersMostDanceablePlaylist(username)
-
-        return ResponseEntity.ok(result)
+    override fun getUsersMostDanceablePlaylist(username: String): ResponseEntity<GetPlaylistResponse> {
+        return playlistService.getUsersMostDanceablePlaylist(username).fold({ error ->
+                               ResponseEntity
+                                       .status(error.httpStatusCode)
+                                       .body(GetPlaylistResponse(null, error))
+                           }) { playlist ->
+            ResponseEntity.ok(GetPlaylistResponse(playlist, null))
+        }
     }
 
-    override fun getUsersMostLoudPlaylist(username: String): Playlist {
+    override fun getUsersMostLoudPlaylist(username: String): ResponseEntity<GetPlaylistResponse> {
         TODO("Not yet implemented")
     }
 
-    override fun getUsersMostEnergeticPlaylist(username: String): Playlist {
+    override fun getUsersMostEnergeticPlaylist(username: String): ResponseEntity<GetPlaylistResponse> {
         TODO("Not yet implemented")
     }
 
-    override fun getUsersMostAcousticPlaylist(username: String): Playlist {
+    override fun getUsersMostAcousticPlaylist(username: String): ResponseEntity<GetPlaylistResponse> {
         TODO("Not yet implemented")
     }
 
-    override fun getMostInstrumentalPlaylist(username: String): Playlist {
+    override fun getMostInstrumentalPlaylist(username: String): ResponseEntity<GetPlaylistResponse> {
         TODO("Not yet implemented")
     }
 }

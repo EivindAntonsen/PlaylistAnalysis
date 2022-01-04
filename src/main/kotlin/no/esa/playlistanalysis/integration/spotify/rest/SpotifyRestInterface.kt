@@ -1,37 +1,28 @@
 package no.esa.playlistanalysis.integration.spotify.rest
 
+import io.vavr.control.Either
 import no.esa.playlistanalysis.annotation.Logged
-import no.esa.playlistanalysis.config.SpotifyProperties
 import no.esa.playlistanalysis.enums.APIType
-import no.esa.playlistanalysis.integration.spotify.model.ArrayOfPlaylist
-import no.esa.playlistanalysis.integration.spotify.model.AudioFeatures
-import no.esa.playlistanalysis.utils.Outcome
+import no.esa.playlistanalysis.integration.spotify.model.getplaylist.ArrayOfPlaylist
+import no.esa.playlistanalysis.integration.spotify.model.getplaylist.AudioFeatures
+import no.esa.playlistanalysis.utils.ApiError
+import no.esa.playlistanalysis.utils.tryEither
 import org.slf4j.Logger
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.client.ClientHttpRequestInterceptor
-import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.context.SecurityContextImpl
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
-import org.springframework.security.oauth2.client.registration.ClientRegistration
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import org.springframework.web.util.UriComponentsBuilder
 
 @Component
-class SpotifyRestInterface(private val logger: Logger,
-                           private val spotifyProperties: SpotifyProperties,
-                           private val clientRegistrationRepository: InMemoryClientRegistrationRepository,
-                           private val authorizedClientService: OAuth2AuthorizedClientService) : ISpotifyRestInterface {
+class SpotifyRestInterface(private val logger: Logger) : ISpotifyRestInterface {
 
     companion object {
-
         private const val BASE_URL = "https://api.spotify.com/v1/"
-        private const val ACCESS_TOKEN_URL = "https://accounts.spotify.com/api/token"
         private val USER_PLAYLIST_PATH = { userName: String -> "users/$userName/playlists" }
+        private val PLAYLIST_TRACKS_PATH = { playlistId: String -> "playlists/$playlistId/tracks" }
         private val AUDIO_FEATURES_PATH = { songId: String -> "audio-features/${songId}" }
     }
 
@@ -44,38 +35,38 @@ class SpotifyRestInterface(private val logger: Logger,
         }
     }
 
+    @Logged(APIType.EXTERNAL)
+    private inline fun <reified T : Any> getForEntity(uri: String): Either<Exception, T> {
+        return tryEither {
+            restTemplate().getForEntity<T>(uri).body!!
+        }
+    }
+
     private fun buildUri(url: String, parameters: Map<String, String>): String {
         return UriComponentsBuilder.fromHttpUrl(url).apply {
             parameters.forEach { (key, value) -> queryParam(key, value) }
         }.build().toUriString()
     }
 
-    @Logged(APIType.EXTERNAL)
-    private inline fun <reified T : Any> getForEntity(uri: String): Outcome<T> {
-        return try {
-            val response = restTemplate().getForEntity<T>(uri)
+    override fun getUsersPlaylists(username: String): Either<ApiError, ArrayOfPlaylist> {
+        val uri = buildUri(BASE_URL + USER_PLAYLIST_PATH(username), emptyMap())
 
-            if (response.statusCode.is2xxSuccessful && response.body != null) {
-                Outcome.Success(response.body!!)
-            } else Outcome.Error(response.statusCode.reasonPhrase, null)
-        } catch (exception: Exception) {
-            val message = exception.message
-
-            logger.error(message)
-
-            Outcome.Error(message ?: "Failed to get entity at uri: $uri", exception)
+        return getForEntity<ArrayOfPlaylist>(uri).mapLeft { exception ->
+            ApiError("Failed to get playlists: ${exception.message}", HttpStatus.INTERNAL_SERVER_ERROR.value())
         }
     }
 
-    override fun getUsersPlaylists(username: String): Outcome<ArrayOfPlaylist> {
-        val uri = buildUri(BASE_URL + USER_PLAYLIST_PATH(username), emptyMap())
-
-        return getForEntity(uri)
-    }
-
-    override fun getTracksAudioFeatures(songId: String): Outcome<AudioFeatures> {
+    override fun getTracksAudioFeatures(songId: String): Either<ApiError, AudioFeatures> {
         val uri = buildUri(BASE_URL + AUDIO_FEATURES_PATH(songId), emptyMap())
 
-        return getForEntity(uri)
+        return getForEntity<AudioFeatures>(uri).mapLeft { exception ->
+            ApiError("Failed to get audio features: ${exception.message}", HttpStatus.INTERNAL_SERVER_ERROR.value())
+        }
+    }
+
+    fun getPlaylistsTracks(playlistId: String) {
+        val uri = buildUri(BASE_URL + PLAYLIST_TRACKS_PATH(playlistId), emptyMap())
+
+
     }
 }

@@ -4,11 +4,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InjectionPoint
 import org.springframework.boot.SpringBootConfiguration
-import org.springframework.boot.system.SystemProperties
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.PropertySource
 import org.springframework.context.annotation.Scope
 import org.springframework.security.oauth2.client.registration.ClientRegistration
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
@@ -17,10 +15,10 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod
 import java.util.*
 
+
 @SpringBootConfiguration
 @ComponentScan
-@PropertySource("file:src/main/resources/properties/application.properties")
-class ApplicationConfig {
+class ApplicationConfig(private val spotifyProperties: SpotifyProperties) {
 
     @Bean
     @Scope("prototype")
@@ -45,18 +43,18 @@ class ApplicationConfig {
         return InMemoryClientRegistrationRepository(this.spotifyClientRegistration())
     }
 
-    private fun spotifyClientRegistration(): ClientRegistration {
+    fun spotifyClientRegistration(): ClientRegistration {
         return ClientRegistration
                 .withRegistrationId("spotify")
-                .clientId(SystemProperties.get("clientId"))
-                .clientSecret(SystemProperties.get("clientSecret"))
+                .clientId(spotifyProperties.clientId)
+                .clientSecret(spotifyProperties.clientSecret)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri("http://localhost:8098/login/oauth2/code/")
+                .redirectUri(spotifyProperties.redirectUri)
                 .scope("user-read-private", "user-read-email")
-                .authorizationUri("https://accounts.spotify.com/authorize")
-                .tokenUri("https://accounts.spotify.com/api/token")
-                .userInfoUri("https://api.spotify.com/v1/me")
+                .authorizationUri(spotifyProperties.authorizationUri)
+                .tokenUri(spotifyProperties.tokenUri)
+                .userInfoUri(spotifyProperties.userInfoUri)
                 .userNameAttributeName("display_name")
                 .clientName("spotify")
                 .build()

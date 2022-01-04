@@ -1,13 +1,15 @@
 package no.esa.playlistanalysis.service.playlist
 
-import no.esa.playlistanalysis.integration.spotify.model.Playlist
+import io.vavr.control.Either
+import no.esa.playlistanalysis.integration.spotify.model.getplaylist.Playlist
+import no.esa.playlistanalysis.utils.ApiError
 
 interface IPlaylistService {
 
-    fun getUsersMostDanceablePlaylist(username: String): Playlist?
-    fun getUsersMostLoudPlaylist(username: String): Playlist
-    fun getUsersMostEnergeticPlaylist(username: String): Playlist
-    fun getUsersMostAcousticPlaylist(username: String): Playlist
-    fun getMostInstrumentalPlaylist(username: String): Playlist
+    fun getUsersMostDanceablePlaylist(username: String): Either<ApiError, no.esa.playlistanalysis.resource.model.Playlist>
+    fun getUsersMostLoudPlaylist(username: String): Either<ApiError, List<no.esa.playlistanalysis.resource.model.Playlist>>
+    fun getUsersMostEnergeticPlaylist(username: String): Either<ApiError, List<no.esa.playlistanalysis.resource.model.Playlist>>
+    fun getUsersMostAcousticPlaylist(username: String): Either<ApiError, List<no.esa.playlistanalysis.resource.model.Playlist>>
+    fun getMostInstrumentalPlaylist(username: String): Either<ApiError, List<no.esa.playlistanalysis.resource.model.Playlist>>
 
 }

@@ -1,4 +1,4 @@
-package no.esa.playlistanalysis.integration.spotify.model
+package no.esa.playlistanalysis.integration.spotify.model.getplaylist
 
 data class ArrayOfPlaylist(val href: String,
                            val playlists: List<Playlist>,
