@@ -24,7 +24,7 @@ class UserController(private val logger: Logger) {
 
     @Logged(APIType.EXTERNAL)
     @RequestMapping("/login/oauth2/code/spotify", produces = ["application/json"])
-    fun login(@RequestParam code: Any) {
-        logger.info("This is the code: ${code.toString()}!")
+    fun login(@RequestParam code: String) {
+        logger.info("This is the code: ${code}!")
     }
 }

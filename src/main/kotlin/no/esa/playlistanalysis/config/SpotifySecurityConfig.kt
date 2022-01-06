@@ -6,10 +6,16 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @Configuration
 class SpotifySecurityConfig : WebSecurityConfigurerAdapter() {
+    companion object {
+        val PUBLIC_ANT_MATCHES = listOf("/*", "/register", "/login", "/home", "/session").toTypedArray()
+    }
 
     override fun configure(httpSecurity: HttpSecurity) {
-        httpSecurity.authorizeRequests { authorize ->
-            authorize.anyRequest().authenticated()
-        }.oauth2Login()
+        httpSecurity.authorizeRequests()
+                .antMatchers(*PUBLIC_ANT_MATCHES).permitAll()
+                .antMatchers("/admin").hasAuthority("ADMIN")
+                .and().authorizeRequests { authorize ->
+                    authorize.anyRequest().authenticated()
+                }.oauth2Login()
     }
 }

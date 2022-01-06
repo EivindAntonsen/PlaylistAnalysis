@@ -1,19 +1,21 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          clientId: ${clientId}
+          clientSecret: ${clientSecret}
+          accessTokenUri: https://accounts.spotify.com/api/token
+          userAuthorizationUri: https://accounts.spotify.com/authorize
+          authenticationScheme: query
+          clientAuthenticationScheme: form
+          scope: user-read-private, user-read-email
+          redirectUri: ${redirectUri}
+          resource:
+            userInfoUri: https://api.spotify.com/v1/me
   application:
     name: PlaylistAnalysis
 api:
   basePackage: no.esa.playlistanalysis
 server:
   port: ${port}
-security:
-  oauth2:
-    client:
-      clientId: ${clientId}
-      clientSecret: ${clientSecret}
-      accessTokenUri: https://accounts.spotify.com/api/token
-      userAuthorizationUri: https://accounts.spotify.com/authorize
-      authenticationScheme: query
-      clientAuthenticationScheme: form
-      scope: user-read-private, user-read-email
-    resource:
-      userInfoUri: https://api.spotify.com/v1/me
