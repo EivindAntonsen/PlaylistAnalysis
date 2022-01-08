@@ -26,6 +26,8 @@ dependencies {
         val security = "spring-boot-starter-security"
         val devtools = "spring-boot-devtools"
         val test = "spring-boot-starter-test"
+        val processor = "spring-boot-configuration-processor"
+        val processorVersion = "2.6.2"
     }
     val swagger = object {
         val group = "io.springfox"
@@ -33,36 +35,33 @@ dependencies {
         val bootStarter = "springfox-boot-starter"
         val version = "3.0.0"
     }
-    val vavr = object {
-        val group = "io.vavr"
-        val vavr = "vavr"
-        val version = "1.0.0-alpha-4"
-
+    val jetbrains = object {
+        val group = "org.jetbrains.kotlin"
+        val reflect = "kotlin-reflect"
+        val stdlib = "kotlin-stdlib-jdk8"
     }
-    val jetbrains = "org.jetbrains.kotlin"
 
-    implementation(vavr.group, vavr.vavr, vavr.version)
+    with(spring) {
+        implementation(group, web)
+        implementation(group, oauth2Client)
+        implementation(group, aop)
+        implementation(group, cache)
+        implementation(group, security)
+        developmentOnly(group, devtools)
+        testImplementation(group, test)
+        annotationProcessor(group, processor, processorVersion)
+    }
+    with(jetbrains) {
+        implementation(group, reflect)
+        implementation(group, stdlib)
+    }
+    with(swagger) {
+        implementation(group, ui, version)
+        implementation(group, bootStarter, version)
+    }
 
-    // spring
-    implementation(spring.group, spring.web)
-    implementation(spring.group, spring.oauth2Client)
-    implementation(spring.group, spring.aop)
-    implementation(spring.group, spring.cache)
-    implementation(spring.group, spring.security)
-    developmentOnly(spring.group, spring.devtools)
-    testImplementation(spring.group, spring.test)
-
-    // Kotlin
-    implementation(group = jetbrains, name = "kotlin-reflect")
-    implementation(group = jetbrains, name = "kotlin-stdlib-jdk8")
-    // Swagger
-    implementation(swagger.group, swagger.ui, version = swagger.version)
-    implementation(swagger.group, swagger.bootStarter, version = swagger.version)
-    // Other
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    // https://mvnrepository.com/artifact/io.vavr/vavr
-    implementation("io.vavr:vavr:1.0.0-alpha-4")
-
+    implementation(group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version = "2.13.1")
+    implementation(group = "io.vavr", name = "vavr", version = "1.0.0-alpha-4")
 }
 
 tasks.withType<KotlinCompile> {

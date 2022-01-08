@@ -8,16 +8,17 @@ import no.esa.playlistanalysis.utils.getKClass
 import no.esa.playlistanalysis.utils.getLogger
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
+import org.aspectj.lang.annotation.Aspect
 import org.slf4j.Logger
 import org.springframework.boot.logging.LogLevel
 import org.springframework.stereotype.Component
 import kotlin.reflect.KClass
 
+@Aspect
 @Component
 class LogAspect {
 
     companion object {
-
         private val DEFAULT_LOG_LEVEL = LogLevel.WARN
         private val DEFAULT_API_TYPE = APIType.INTERNAL
         private const val MAX_LENGTH_API_TYPE_EVENT_NAME = 8

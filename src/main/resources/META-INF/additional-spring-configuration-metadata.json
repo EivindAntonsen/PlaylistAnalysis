@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "api.basePackage",
+      "type": "java.lang.String",
+      "description": "Base package for the project."
+    }
+  ]
+}

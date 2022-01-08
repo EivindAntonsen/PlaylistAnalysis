@@ -11,6 +11,13 @@ import org.slf4j.Logger
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.client.ClientHttpRequestInterceptor
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthorizationCodeReactiveAuthenticationManager
+import org.springframework.security.oauth2.client.authentication.OAuth2LoginReactiveAuthenticationManager
+import org.springframework.security.oauth2.core.OAuth2Token
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User
+import org.springframework.security.web.authentication.WebAuthenticationDetails
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
@@ -51,6 +58,12 @@ class SpotifyRestInterface(private val logger: Logger) : ISpotifyRestInterface {
     override fun getUsersPlaylists(username: String): Either<ApiError, ArrayOfPlaylist> {
         val uri = buildUri(BASE_URL + USER_PLAYLIST_PATH(username), emptyMap())
 
+        val token: OAuth2AuthenticationToken = SecurityContextHolder.getContext().authentication as OAuth2AuthenticationToken
+
+        println(SecurityContextHolder.getContext().authentication::class.qualifiedName)
+
+
+
         return getForEntity<ArrayOfPlaylist>(uri).mapLeft { exception ->
             ApiError("Failed to get playlists: ${exception.message}", HttpStatus.INTERNAL_SERVER_ERROR.value())
         }
@@ -66,7 +79,6 @@ class SpotifyRestInterface(private val logger: Logger) : ISpotifyRestInterface {
 
     fun getPlaylistsTracks(playlistId: String) {
         val uri = buildUri(BASE_URL + PLAYLIST_TRACKS_PATH(playlistId), emptyMap())
-
 
     }
 }

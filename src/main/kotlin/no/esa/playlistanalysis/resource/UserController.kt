@@ -4,11 +4,10 @@ import no.esa.playlistanalysis.annotation.Logged
 import no.esa.playlistanalysis.enums.APIType
 import org.slf4j.Logger
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
+import org.springframework.security.oauth2.core.oidc.OidcIdToken
 import org.springframework.security.oauth2.core.user.OAuth2User
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class UserController(private val logger: Logger) {
@@ -23,7 +22,7 @@ class UserController(private val logger: Logger) {
     }
 
     @Logged(APIType.EXTERNAL)
-    @RequestMapping("/login/oauth2/code/spotify", produces = ["application/json"])
+    @GetMapping("/login/oauth2/code/spotify")
     fun login(@RequestParam code: String) {
         logger.info("This is the code: ${code}!")
     }

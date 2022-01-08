@@ -11,6 +11,9 @@ data class SpotifyProperties(@Value(CLIENT_ID) val clientId: String,
                              @Value(TOKEN_URI) val tokenUri: String,
                              @Value(USER_INFO_URI) val userInfoUri: String) {
 
+    val scope = listOf("user-read-private", "user-read-email")
+
+
     companion object {
 
         private const val CLIENT_ID = "\${clientId}"

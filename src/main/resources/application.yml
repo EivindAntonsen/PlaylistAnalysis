@@ -1,6 +1,17 @@
 spring:
   application:
     name: PlaylistAnalysis
+  security:
+    oauth2:
+      client:
+        registration:
+          facebook:
+            clientId: ${clientId}
+            clientSecret: ${clientSecret}
+            redirectUri: ${redirectUri}
+            authorizationUri: ${authorizationUri}
+            tokenUri: ${tokenUri}
+            userInfoUri: ${userInfoUri}
 api:
   basePackage: no.esa.playlistanalysis
 server:
